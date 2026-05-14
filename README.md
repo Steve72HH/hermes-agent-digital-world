@@ -181,41 +181,6 @@ docker compose -f docker-compose.yml -f compose/docker-compose.api-router.yml up
 
 Dann wird `https://api.hermes.digital-world.dev/v1` geroutet. Nur mit starkem API-Key, Auth-Middleware und sinnvoller IP-/Firewall-Absicherung betreiben.
 
-## Veröffentlichung unter GitHub
 
-Empfohlener Repo-Name:
-
-```text
-hermes-agent-digital-world
-```
-
-Initial Push:
-
-```bash
-git init
-git add .
-git commit -m "Initial digital-world.dev Hermes Agent Traefik stack"
-git branch -M main
-git remote add origin git@github.com:Steve72HH/hermes-agent-digital-world.git
-git push -u origin main
-```
-
-Vor dem Push prüfen:
-
-```bash
-git status
-git diff --cached --stat
-```
-
-Nicht committen:
-
-- `.env`
-- `data/`
-- `backups/`
-- private Keys
-- OAuth-Dateien
-- API-Keys/Passwörter
-
-## Herkunft / Lizenz
 
 Diese Version basiert konzeptionell auf `oliverhees/hermes-agent-oneshot-installer`, wurde aber auf ein bestehendes Traefik-/digital-world.dev-Serverumfeld umgebaut. Die Ursprungsversion ist MIT-lizenziert. Siehe `NOTICE` und `LICENSE`.

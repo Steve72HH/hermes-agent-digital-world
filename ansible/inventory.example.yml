@@ -1,0 +1,15 @@
+all:
+  hosts:
+    hermes_server:
+      ansible_host: 1.2.3.4
+      ansible_user: admin
+      ansible_become: true
+  vars:
+    hermes_domain: hermes.digital-world.dev
+    hermes_api_domain: api.hermes.digital-world.dev
+    hermes_stack_dir: /opt/digital-world/hermes
+    traefik_network: proxy
+    traefik_entrypoint: websecure
+    traefik_certresolver: le
+    traefik_basic_auth_users: 'admin:$$2y$$05$$REPLACE_THIS_HASH'
+    api_server_key: 'REPLACE_WITH_OPENSSL_RAND_HEX_32'

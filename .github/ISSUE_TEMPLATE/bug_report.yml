@@ -1,0 +1,22 @@
+name: Bug report
+description: Fehler im digital-world.dev Hermes Stack melden
+title: "[Bug]: "
+labels: ["bug", "digital-world.dev", "hermes"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Was ist passiert?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Bitte Secrets entfernen.
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: Version / Commit

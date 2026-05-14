@@ -1,0 +1,17 @@
+name: Feature request
+description: Erweiterung für den digital-world.dev Hermes Stack vorschlagen
+title: "[Feature]: "
+labels: ["enhancement", "digital-world.dev", "hermes"]
+body:
+  - type: textarea
+    id: usecase
+    attributes:
+      label: Use Case
+      description: Welches Problem löst die Änderung?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Vorschlag
+      description: Wie sollte es umgesetzt werden?

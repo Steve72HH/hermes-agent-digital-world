@@ -1,0 +1,81 @@
+services:
+  hermes:
+    image: ${HERMES_IMAGE:-nousresearch/hermes-agent:latest}
+    container_name: digitalworld-hermes
+    hostname: hermes.digital-world.dev
+    restart: unless-stopped
+    command: gateway run
+    # Hermes image already starts through tini. Additional Compose init caused noisy
+    # "Tini is not running as PID 1" warnings in this deployment.
+    init: false
+    stop_grace_period: 30s
+    env_file:
+      - .env
+    environment:
+      HERMES_DASHBOARD: "1"
+      HERMES_DASHBOARD_HOST: "0.0.0.0"
+      HERMES_DASHBOARD_PORT: "9119"
+      HERMES_DASHBOARD_TUI: "${HERMES_DASHBOARD_TUI:-0}"
+      TINI_SUBREAPER: "1"
+      # Gateway users are still protected externally through Traefik Basic Auth.
+      # Keep the API router disabled unless you intentionally expose it.
+      GATEWAY_ALLOW_ALL_USERS: "${GATEWAY_ALLOW_ALL_USERS:-true}"
+      API_SERVER_ENABLED: "true"
+      API_SERVER_HOST: "0.0.0.0"
+      API_SERVER_PORT: "8642"
+      API_SERVER_KEY: "${API_SERVER_KEY}"
+      API_SERVER_CORS_ORIGINS: "https://${HERMES_DOMAIN:-hermes.digital-world.dev}"
+      TZ: "${TZ:-Europe/Berlin}"
+    volumes:
+      - ./data/hermes:/opt/data
+    networks:
+      - proxy
+    labels:
+      # ----------------------------------------------------------------
+      # digital-world.dev ownership / metadata
+      # ----------------------------------------------------------------
+      - "org.opencontainers.image.title=Hermes Agent for digital-world.dev"
+      - "org.opencontainers.image.description=Traefik based Hermes Agent deployment for hermes.digital-world.dev"
+      - "org.opencontainers.image.vendor=digital-world.dev"
+      - "org.opencontainers.image.authors=kontakt@digital-world.dev"
+      - "com.digital-world.owner=${DW_OWNER:-digital-world.dev}"
+      - "com.digital-world.service=${DW_SERVICE:-hermes-agent}"
+      - "com.digital-world.environment=${DW_ENV:-prod}"
+      - "com.digital-world.domain=${HERMES_DOMAIN:-hermes.digital-world.dev}"
+
+      # ----------------------------------------------------------------
+      # Traefik router: Dashboard
+      # ----------------------------------------------------------------
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_NETWORK:-proxy}"
+      - "traefik.http.routers.hermes-dw.rule=Host(`${HERMES_DOMAIN:-hermes.digital-world.dev}`)"
+      - "traefik.http.routers.hermes-dw.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.hermes-dw.tls=true"
+      - "traefik.http.routers.hermes-dw.tls.certresolver=${TRAEFIK_CERTRESOLVER:-le}"
+      - "traefik.http.routers.hermes-dw.service=hermes-dw-dashboard"
+      - "traefik.http.routers.hermes-dw.middlewares=hermes-dw-auth@docker,hermes-dw-security@docker,hermes-dw-compress@docker"
+      - "traefik.http.services.hermes-dw-dashboard.loadbalancer.server.port=9119"
+
+      # ----------------------------------------------------------------
+      # Traefik middleware: Basic Auth + headers
+      # ----------------------------------------------------------------
+      - "traefik.http.middlewares.hermes-dw-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS}"
+      - "traefik.http.middlewares.hermes-dw-auth.basicauth.removeheader=true"
+      - "traefik.http.middlewares.hermes-dw-compress.compress=true"
+      - "traefik.http.middlewares.hermes-dw-security.headers.browserxssfilter=true"
+      - "traefik.http.middlewares.hermes-dw-security.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.hermes-dw-security.headers.framedeny=true"
+      - "traefik.http.middlewares.hermes-dw-security.headers.referrerpolicy=no-referrer"
+      - "traefik.http.middlewares.hermes-dw-security.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.hermes-dw-security.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.hermes-dw-security.headers.stspreload=true"
+    # Disabled deliberately. Hermes dashboard/gateway does not expose a stable
+    # generic /health endpoint in all versions. The separate scripts/healthcheck.sh
+    # checks the dashboard socket and Traefik route without poisoning Docker state.
+    healthcheck:
+      disable: true
+
+networks:
+  proxy:
+    external: true
+    name: ${TRAEFIK_NETWORK:-proxy}

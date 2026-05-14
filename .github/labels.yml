@@ -1,0 +1,24 @@
+- name: digital-world.dev
+  color: "00d4ff"
+  description: digital-world.dev branding and platform integration
+- name: hermes
+  color: "7c3aed"
+  description: Hermes Agent related
+- name: traefik
+  color: "24a1c1"
+  description: Traefik routing, middleware or TLS
+- name: docker
+  color: "2496ed"
+  description: Docker Compose or container runtime
+- name: security
+  color: "d73a4a"
+  description: Security hardening, auth or exposure risk
+- name: documentation
+  color: "0075ca"
+  description: Documentation improvements
+- name: bug
+  color: "d73a4a"
+  description: Something is not working
+- name: enhancement
+  color: "a2eeef"
+  description: New feature or improvement

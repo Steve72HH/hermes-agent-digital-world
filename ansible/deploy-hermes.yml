@@ -1,0 +1,94 @@
+---
+- name: Deploy Hermes Agent for digital-world.dev
+  hosts: hermes_server
+  become: true
+  vars:
+    hermes_stack_dir: /opt/digital-world/hermes
+    hermes_domain: hermes.digital-world.dev
+    hermes_api_domain: api.hermes.digital-world.dev
+    traefik_network: proxy
+    traefik_entrypoint: websecure
+    traefik_certresolver: le
+    hermes_image: nousresearch/hermes-agent:latest
+    timezone: Europe/Berlin
+  tasks:
+    - name: Ensure packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - rsync
+          - tar
+          - gzip
+        state: present
+        update_cache: true
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure stack directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - "{{ hermes_stack_dir }}"
+        - "{{ hermes_stack_dir }}/data/hermes"
+        - "{{ hermes_stack_dir }}/compose"
+        - "{{ hermes_stack_dir }}/scripts"
+        - "{{ hermes_stack_dir }}/docs"
+
+    - name: Ensure docker network for Traefik exists
+      community.docker.docker_network:
+        name: "{{ traefik_network }}"
+        state: present
+
+    - name: Copy repository files
+      ansible.builtin.synchronize:
+        src: "../"
+        dest: "{{ hermes_stack_dir }}/"
+        delete: false
+        rsync_opts:
+          - "--exclude=.git"
+          - "--exclude=.env"
+          - "--exclude=data"
+          - "--exclude=backups"
+
+    - name: Write .env
+      ansible.builtin.copy:
+        dest: "{{ hermes_stack_dir }}/.env"
+        mode: "0600"
+        content: |
+          COMPOSE_PROJECT_NAME=digitalworld-hermes
+          HERMES_DOMAIN={{ hermes_domain }}
+          HERMES_API_DOMAIN={{ hermes_api_domain }}
+          TRAEFIK_NETWORK={{ traefik_network }}
+          TRAEFIK_ENTRYPOINT={{ traefik_entrypoint }}
+          TRAEFIK_CERTRESOLVER={{ traefik_certresolver }}
+          TRAEFIK_BASIC_AUTH_USERS={{ traefik_basic_auth_users }}
+          HERMES_IMAGE={{ hermes_image }}
+          HERMES_DASHBOARD_TUI=0
+          GATEWAY_ALLOW_ALL_USERS=true
+          API_SERVER_KEY={{ api_server_key }}
+          TZ={{ timezone }}
+          DW_OWNER=digital-world.dev
+          DW_SERVICE=hermes-agent
+          DW_ENV=prod
+          DW_MAINTAINER=kontakt@digital-world.dev
+
+    - name: Ensure Hermes data directory mode
+      ansible.builtin.file:
+        path: "{{ hermes_stack_dir }}/data/hermes"
+        mode: "0700"
+        state: directory
+
+    - name: Start Hermes stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ hermes_stack_dir }}"
+        pull: always
+        state: present
+
+
+    - name: Fix Hermes data permissions inside container
+      ansible.builtin.command: bash scripts/fix-permissions.sh
+      args:
+        chdir: "{{ hermes_stack_dir }}"
+      changed_when: false

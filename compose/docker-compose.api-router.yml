@@ -1,0 +1,17 @@
+# Optional override: exposes the OpenAI-compatible Hermes API publicly.
+# Use only if you understand the risk and protect it with API keys, auth and IP filtering.
+# Start with:
+# docker compose -f docker-compose.yml -f compose/docker-compose.api-router.yml up -d
+
+services:
+  hermes:
+    labels:
+      - "traefik.http.routers.hermes-dw-api.rule=Host(`${HERMES_API_DOMAIN:-api.hermes.digital-world.dev}`)"
+      - "traefik.http.routers.hermes-dw-api.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}"
+      - "traefik.http.routers.hermes-dw-api.tls=true"
+      - "traefik.http.routers.hermes-dw-api.tls.certresolver=${TRAEFIK_CERTRESOLVER:-le}"
+      - "traefik.http.routers.hermes-dw-api.service=hermes-dw-api"
+      - "traefik.http.routers.hermes-dw-api.middlewares=hermes-dw-auth@docker,hermes-dw-security@docker,hermes-dw-api-ratelimit@docker"
+      - "traefik.http.services.hermes-dw-api.loadbalancer.server.port=8642"
+      - "traefik.http.middlewares.hermes-dw-api-ratelimit.ratelimit.average=30"
+      - "traefik.http.middlewares.hermes-dw-api-ratelimit.ratelimit.burst=60"

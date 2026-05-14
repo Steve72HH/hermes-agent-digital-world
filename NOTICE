@@ -1,0 +1,17 @@
+Hermes Agent for digital-world.dev
+==================================
+
+This repository is a substantially adapted Traefik/digital-world.dev deployment variant inspired by:
+
+  oliverhees/hermes-agent-oneshot-installer
+  https://github.com/oliverhees/hermes-agent-oneshot-installer
+
+The upstream project is MIT licensed. The original concept provided a one-shot Hermes Agent installer using Docker, Caddy, TLS and Basic Auth. This version changes the deployment model to an existing Docker/Traefik server environment, uses digital-world.dev paths, domains and labels, and adds operational scripts/docs for publishing under the digital-world.dev / Steve72HH GitHub namespace.
+
+Hermes Agent itself is developed by Nous Research:
+
+  https://github.com/NousResearch/hermes-agent
+
+This repository does not vendor Hermes Agent source code. It deploys the official container image by default:
+
+  nousresearch/hermes-agent:latest

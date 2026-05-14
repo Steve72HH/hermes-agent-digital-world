@@ -187,7 +187,7 @@ Dann wird `https://api.hermes.digital-world.dev/v1` geroutet. Nur mit starkem AP
 ## Screenshot
 
 <p align="center">
-  <img src="docs/assets/hermes-webui.png" alt="Hermes Agent Weboberfläche" width="900">
+  <img src="[docs/assets/hermes-webui.png](https://github.com/Steve72HH/hermes-agent-digital-world/tree/main/docs/assets)" alt="Hermes Agent Weboberfläche" width="900">
 </p>
 
 ## Herkunft / Lizenz

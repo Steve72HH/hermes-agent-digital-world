@@ -181,6 +181,16 @@ docker compose -f docker-compose.yml -f compose/docker-compose.api-router.yml up
 
 Dann wird `https://api.hermes.digital-world.dev/v1` geroutet. Nur mit starkem API-Key, Auth-Middleware und sinnvoller IP-/Firewall-Absicherung betreiben.
 
+<<<<<<< HEAD
 
+=======
+## Screenshot
+
+<p align="center">
+  <img src="docs/assets/hermes-webui.png" alt="Hermes Agent Weboberfläche" width="900">
+</p>
+
+## Herkunft / Lizenz
+>>>>>>> 0835276 (Add Hermes Web UI screenshot)
 
 Diese Version basiert konzeptionell auf `oliverhees/hermes-agent-oneshot-installer`, wurde aber auf ein bestehendes Traefik-/digital-world.dev-Serverumfeld umgebaut. Die Ursprungsversion ist MIT-lizenziert. Siehe `NOTICE` und `LICENSE`.
